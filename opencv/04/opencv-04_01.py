@@ -11,12 +11,16 @@ M = cv2.getRotationMatrix2D((cX, cY), 45, 1.0)
 rotated = cv2.warpAffine(img, M, (w, h))
 cv2.imshow("C_rotate 45", rotated)
 print(M)
+# [[  0.70710678   0.70710678 -46.39191899]
+#  [ -0.70710678   0.70710678 112.        ]]
 
 #원점rotate 45도
 M = cv2.getRotationMatrix2D((0, 0), 45, 1.0)
 rotated = cv2.warpAffine(img, M, (w, h))
 cv2.imshow("0_rotate 45", rotated)
 print(M)
+# [[ 0.70710678  0.70710678  0.        ]
+#  [-0.70710678  0.70710678  0.        ]]
 
 #원점rotate 45도
 M = cv2.getRotationMatrix2D((0, 0), 45, 0.5)
