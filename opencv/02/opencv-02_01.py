@@ -11,7 +11,7 @@ cv2.circle(img, (50, 50), 10, (0, 0, 255), -1)
 
 #사각형 그리기
 cv2.rectangle(img, (170, 150), (200, 200), (255, 0, 0), 2)
-cv2.rectangle(img, (0, 150), (100, 200), (255, 0, 0), -1)
+cv2.rectangle(img, (0, 150), (100, 200), (255, 0, 0), cv2.FILLED)
 
 cv2.imshow("02_01 draw", img)
 cv2.waitKey(0)#키 입력
