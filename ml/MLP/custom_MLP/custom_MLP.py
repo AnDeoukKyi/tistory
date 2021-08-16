@@ -57,61 +57,64 @@ train_y = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2], dtype="uint8")# * 255
 
 
 # input - hidden layer
-w1 = np.random.randn(6, 15)
+w1 = np.random.randn(15)
 # print("weight1\n", w1)
 
-b1 = np.random.randn(15,1)
+b1 = np.random.randn(10)
 # print("bias1\n", b1)
 
 # hidden - output layer
-w2 = np.random.randn(3, 6)
-print("weight2\n", w2)
-b2 = np.random.randn(3)
-print("bias2\n", b2)
+w2 = np.random.randn(10)
+# print("weight2\n", w2)
+b2 = np.random.randn(4)
+# print("bias2\n", b2)
 
-epoch = 1000
+# hidden - output layer
+w3 = np.random.randn(4)
+# print("weight2\n", w2)
+b3 = np.random.randn(1)
+# print("bias2\n", b2)
+
+epoch = 20000
 learnRate = 1
 mse = []
+Error = None
 
 for index_epoch in range(epoch):
     print(index_epoch+1, "번째 학습입니다.", index_epoch+1 , "/", epoch)
-    Error = np.array([[]])
-    result = np.array([])
 
     for index_train in range(len(train_x)):
         # FeedForword(순전파)
-        i2hLayer = np.array([])
 
         # input to hidden Layer
-        for index_weight1 in range(len(w1)):
-            i2hLayer = np.append(i2hLayer, sigmoid(weighted_sum(train_x[index_train], w1[index_weight1], b1[index_weight1][0])))
-
+        i2hLayer = sigmoid(weighted_sum(train_x[index_train], w1, b1))
+        # input to hidden Layer
+        i2hLayer1 = sigmoid(weighted_sum(i2hLayer, w2, b2))
         # hidden to output Layer
-        h2oLayer = sigmoid(weighted_sum(i2hLayer, w2, b2))
+        h2oLayer = sigmoid(weighted_sum(i2hLayer1, w3, b3))
 
         #error
-        classify = np.zeros(3)
-        classify[train_y[index_train]] = 1
-        Error = np.append(Error, classify - softmax(h2oLayer))
-        result = np.append(result, softmax(h2oLayer))
-
+        Error = ((train_y[index_train] - h2oLayer)**2)/2
+        # result = np.append(result, h2oLayer)
 
         #Back-Propagation(역전파)
         # hidden to output Layer
-        a2 = Error * h2oLayer * (1 - h2oLayer)
+        a3 = -(h2oLayer - train_y[index_train]) * h2oLayer * (1 - h2oLayer)
+        b3 = b3 + learnRate * a3
+        w3 = w3 + (learnRate * a3 * i2hLayer1)
+
+        a2 = np.sum(a3 * i2hLayer1 * (1 - i2hLayer1))
+        b2 = b2 + learnRate * a2
+        w2 = w2 + (learnRate * a2 * i2hLayer)
 
         # input to hidden Layer
-        a1 = a2 * i2hLayer * (1 - i2hLayer) * w2
-
-        # weight update
-        w2 = w2 + (learnRate * a2 * i2hLayer)
-        b2 = b2 + learnRate * a2
-
-        w1 = w1 + np.ones((2,2)) * learnRate * a1 * train_x[index_train]
+        a1 = np.sum(a2 * i2hLayer * (1 - i2hLayer))
         b1 = b1 + learnRate * a1
+        w1 = w1 + (learnRate * a1 * train_x[index_train])
+        # print("mse", Error)
     #학습완료
-    print("mse", np.mean(Error ** 2))
-    mse.append(np.mean(Error ** 2))
+    print("mse", Error)
+    # mse.append(np.mean(Error ** 2))
 
 
 
@@ -126,8 +129,7 @@ for index_epoch in range(epoch):
 test = [zero, one, two]
 for input in test:
     # input to hidden Layer
-    for index_weight1 in range(len(w1)):
-        i2hLayer = sigmoid(weighted_sum(input, w1[index_weight1], b1[index_weight1][0]))
+    i2hLayer = sigmoid(weighted_sum(train_x[index_train], w1, b1))
 
     # hidden to output Layer
     h2oLayer = sigmoid(weighted_sum(i2hLayer, w2, b2))
