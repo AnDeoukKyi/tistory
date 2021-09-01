@@ -62,7 +62,7 @@ b2 = np.random.randn(1, 1)
 # print("bias2\n", b1)
 
 
-epoch = 100
+epoch = 1000
 learnRate = 1
 mse = []
 for i in range(len(train_x)):
@@ -113,15 +113,3 @@ for index in range(len(test)):
     # hidden to output Layer
     h2oLayer = sigmoid(weighted_sum(i2hLayer, w2, b2))
     print(h2oLayer)#결과값
-
-
-
-plt.xlabel('EPOCH')
-plt.ylabel('MSE')
-plt.title('MLP TEST')
-grid=(2,4)
-for i in range(len(train_x)):
-    plt.subplot2grid(grid, (i//4, i%4))
-    plt.plot(mse[i])
-    plt.ylim(-2, 2)
-plt.show()
