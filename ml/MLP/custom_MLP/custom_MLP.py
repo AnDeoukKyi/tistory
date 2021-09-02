@@ -85,7 +85,7 @@ for index_epoch in range(epoch):
 
         #Back-Propagation(역전파)
         # hidden to output Layer
-        a2 = -(train_y[index_train] - h2oLayer) * h2oLayer * h2oLayer * (1 - h2oLayer)
+        a2 = -(train_y[index_train] - h2oLayer) * h2oLayer * (1 - h2oLayer)
         b2 = b2 - learnRate * a2
         w2 = w2 - (learnRate * a2 * i2hLayer)
 
