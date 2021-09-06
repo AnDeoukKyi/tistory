@@ -1,21 +1,11 @@
 import numpy as np
-from matplotlib import pyplot as plt
-
-
 
 def weighted_sum(x, w, b):
-    return np.sum(x * w) + b
+    return np.sum(x * w, axis = 1) + b
 
 #sigmoid activate function
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
-
-def softmax(x):
-    m = np.max(x)
-    exp_x = np.exp(x-m)
-    sum_exp_x = np.sum(exp_x)
-    y = exp_x / sum_exp_x
-    return y
 
 #실제 결과로 매핑할 데이터
 zero = np.array([    1, 1, 1
@@ -28,15 +18,8 @@ one = np.array([    0, 1, 0
                    ,0, 1, 0
                    ,0, 1, 0
                    ,1, 1, 1], dtype="uint8")# * 255
-two = np.array([    1, 1, 1
-                   ,0, 0, 1
-                   ,1, 1, 1
-                   ,1, 0, 0
-                   ,1, 1, 1], dtype="uint8")# * 255
-# print("zero\n", zero)
-# print("one\n", one)
 
-train_x = np.array([ [1, 1, 0,1, 0, 1,1, 0, 1,1, 0, 1,1, 1, 1]# 0
+train_x = np.array([ [1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
                     ,[0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
                     ,[1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
                     ,[1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1]# 0
@@ -52,14 +35,14 @@ train_y = np.array([0, 0, 0, 0, 1, 1, 1, 1], dtype="uint8")# * 255
 
 
 # input - hidden layer
-w1 = np.random.randn(15)
+w1 = np.random.randn(6, 15)
 # print("weight1\n", w1)
 b1 = np.random.randn(6)
 # print("bias1\n", b1)
 
 
 # hidden - output layer
-w2 = np.random.randn(6)
+w2 = np.random.randn(1, 6)
 # print("weight2\n", w2)
 b2 = np.random.randn(1)
 # print("bias2\n", b2)
@@ -79,9 +62,8 @@ for index_epoch in range(epoch):
         # hidden to output Layer
         h2oLayer = sigmoid(weighted_sum(i2hLayer, w2, b2))
 
-        #error
+        #cost
         Error = ((train_y[index_train] - h2oLayer)**2)/2
-        # result = np.append(result, h2oLayer)
 
         #Back-Propagation(역전파)
         # hidden to output Layer
@@ -94,19 +76,9 @@ for index_epoch in range(epoch):
         b1 = b1 - learnRate * a1
         w1 = w1 - (learnRate * a1 * train_x[index_train])
         err.append(Error)
-        print("mse", Error)
+
     #학습완료
     print("mse", sum(err))
-
-
-
-# plt.xlabel('EPOCH')
-# plt.ylabel('MSE')
-# plt.title('MLP TEST')
-# plt.plot(mse)
-# plt.show()
-
-
 
 test = [zero, one]
 for index in range(len(test)):
