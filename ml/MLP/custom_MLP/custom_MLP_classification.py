@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-
+import cv2
 
 def weighted_sum(x, w, b):
     return np.sum(x * w, axis = 1) + b
@@ -9,27 +9,13 @@ def weighted_sum(x, w, b):
 #sigmoid activate function
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
+def sigmoid_dif(x):
+    return x * (1-x)
 
 def softmax(x):
     return np.exp(x) / np.sum(np.exp(x))
 
 #실제 결과로 매핑할 데이터
-zero = np.array([    1, 1, 1
-                    ,1, 0, 1
-                    ,1, 0, 1
-                    ,1, 0, 1
-                    ,1, 1, 1], dtype="uint8")# * 255
-one = np.array([    0, 1, 0
-                   ,1, 1, 0
-                   ,0, 1, 0
-                   ,0, 1, 0
-                   ,1, 1, 1], dtype="uint8")# * 255
-two = np.array([    1, 1, 1
-                   ,0, 0, 1
-                   ,1, 1, 1
-                   ,1, 0, 0
-                   ,1, 1, 1], dtype="uint8")# * 255
-
 train_x = np.array([ [1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
                     ,[0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
                     ,[1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
@@ -38,12 +24,12 @@ train_x = np.array([ [1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
                     ,[0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1]# 1
                     ,[0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1]# 1
                     ,[0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1]# 1
-                    ,[1, 1, 1 ,0, 0, 0 ,1, 1, 1 ,1, 0, 0 ,0, 1, 1]# 2
-                    ,[1, 1, 1 ,0, 0, 1 ,1, 1, 0 ,1, 1, 0 ,1, 1, 1]# 2
-                    ,[1, 1, 1 ,0, 0, 1 ,1, 0, 1 ,1, 0, 0 ,1, 1, 1]# 2
-                    ,[1, 1, 1 ,1, 0, 1 ,0, 1, 1 ,1, 0, 1 ,1, 1, 1]# 2
-                    ], dtype="uint8")# * 255
-train_y = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2], dtype="uint8")# * 255
+                    ,[1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1]# 2
+                    ,[1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1]# 2
+                    ,[1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1]# 2
+                    ,[1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1]# 2
+                    ], dtype="uint8")#* 255
+train_y = np.array([0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2], dtype="uint8")
 
 # print(train_x)
 # print(train_y)
@@ -72,31 +58,50 @@ for index_epoch in range(epoch):
     err = []
     for index_train in range(len(train_x)):
         # FeedForword(순전파)
-
         # input to hidden Layer
         i2hLayer = sigmoid(weighted_sum(train_x[index_train], w1, b1))
         # hidden to output Layer
         h2oLayer = softmax(weighted_sum(i2hLayer, w2, b2))
 
-        #cost
-        Error = np.copy(h2oLayer)
-        Error[train_y[index_train]] -= 1
+        # Error
+        Error = np.sum(h2oLayer[train_y[index_train]])-1
+        err.append(Error)
 
-        #Back-Propagation(역전파)
+        # Back-Propagation(역전파)
+        # Cost = (loss function + softmax)differential
+        # Softmax with Loss
+        Cost = np.copy(h2oLayer)
+        Cost[train_y[index_train]] -= 1
+
         # hidden to output Layer
-        a2 = Error
+        a2 = Cost
         b2 = b2 - learnRate * a2
         w2 = w2 - (learnRate * a2.reshape(a2.shape[0], 1) * i2hLayer)
 
         # input to hidden Layer
-        a1 = np.sum(a2.reshape(a2.shape[0], 1) * i2hLayer * (1 - i2hLayer), axis=0)
+        a1 = np.sum(a2.reshape(a2.shape[0], 1) * sigmoid_dif(i2hLayer), axis=0)
         b1 = b1 - learnRate * a1
         w1 = w1 - (learnRate * a1.reshape(a1.shape[0], 1) * train_x[index_train])
-        err.append(np.sum(Error))
 
     #학습완료
     print("mse", sum(err))
 
+
+zero = np.array([    1, 1, 1
+                    ,1, 0, 1
+                    ,1, 0, 1
+                    ,1, 0, 1
+                    ,1, 1, 1], dtype="uint8")# * 255
+one = np.array([    0, 1, 0
+                   ,1, 1, 0
+                   ,0, 1, 0
+                   ,0, 1, 0
+                   ,1, 1, 1], dtype="uint8")# * 255
+two = np.array([    1, 1, 1
+                   ,0, 0, 1
+                   ,1, 1, 1
+                   ,1, 0, 0
+                   ,1, 1, 1], dtype="uint8")# * 255
 test = [zero, one, two]
 for index in range(len(test)):
     # input to hidden Layer
@@ -104,5 +109,7 @@ for index in range(len(test)):
 
     # hidden to output Layer
     h2oLayer = softmax(weighted_sum(i2hLayer, w2, b2))
+
+    #소숫접3이하 버리기
     np.set_printoptions(formatter={'float_kind': lambda x: "{0:0.3f}".format(x)})
     print(h2oLayer)
