@@ -16,8 +16,7 @@ train_y = np.array([0, 0, 0, 0, 1, 1, 1, 1], dtype="uint8")
 
 #create model
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(15, input_shape=(15,)),
-    tf.keras.layers.Dense(6, activation='sigmoid'),
+    tf.keras.layers.Dense(6, input_shape=(15,), activation='sigmoid'),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 model.compile(loss='mse')
@@ -40,5 +39,3 @@ one = np.array([    0, 1, 0
 test = np.array([zero, one])
 np.set_printoptions(formatter={'float_kind': lambda x: "{0:0.3f}".format(x)})
 print(model.predict(test))
-
-
