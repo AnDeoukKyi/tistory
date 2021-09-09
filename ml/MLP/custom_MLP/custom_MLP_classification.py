@@ -1,7 +1,4 @@
 import numpy as np
-from matplotlib import pyplot as plt
-
-import cv2
 
 def weighted_sum(x, w, b):
     return np.sum(x * w, axis = 1) + b
