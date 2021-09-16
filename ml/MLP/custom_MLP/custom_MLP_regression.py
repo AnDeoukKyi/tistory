@@ -63,10 +63,11 @@ for index_epoch in range(epoch):
         # hidden to output Layer
         a2 = Cost
         b2 = b2 - learnRate * a2
+        w2_tmp = np.copy(w2)
         w2 = w2 - (learnRate * a2.reshape(a2.shape[0], 1) * i2hLayer)
 
         # input to hidden Layer
-        a1 = np.sum(a2.reshape(a2.shape[0], 1) * sigmoid_dif(i2hLayer), axis=0)
+        a1 = np.sum(a2.reshape(a2.shape[0], 1) * sigmoid_dif(w2_tmp), axis=0)
         b1 = b1 - learnRate * a1
         w1 = w1 - (learnRate * a1.reshape(a1.shape[0], 1) * train_x[index_train])
 
