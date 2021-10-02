@@ -7,7 +7,7 @@ def weighted_sum(x, w, b):
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 def sigmoid_dif(x):
-    return x * (1-x)
+    return sigmoid(x) * (1-sigmoid(x))
 
 #실제 결과로 매핑할 데이터
 train_x = np.array([ [1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1]# 0
@@ -48,9 +48,11 @@ for index_epoch in range(epoch):
     for index_train in range(len(train_x)):
         # FeedForword(순전파)
         # input to hidden Layer
-        i2hLayer = sigmoid(weighted_sum(train_x[index_train], w1, b1))
+        i2hLayerNet = weighted_sum(train_x[index_train], w1, b1)
+        i2hLayer = sigmoid(i2hLayerNet)
         # hidden to output Layer
-        h2oLayer = sigmoid(weighted_sum(i2hLayer, w2, b2))
+        h2oLayerNet = weighted_sum(i2hLayer, w2, b2)
+        h2oLayer = sigmoid(h2oLayerNet)
 
         # Error
         Error = ((train_y[index_train] - h2oLayer)**2)/2
@@ -58,16 +60,15 @@ for index_epoch in range(epoch):
 
         #Back-Propagation(역전파)
         # Cost = loss function differential * sigmoid differential
-        Cost = -(train_y[index_train] - h2oLayer) * sigmoid_dif(h2oLayer)
+        Cost = -(train_y[index_train] - h2oLayer) * sigmoid_dif(h2oLayerNet)
 
         # hidden to output Layer
         a2 = Cost
         b2 = b2 - learnRate * a2
-        w2_tmp = np.copy(w2)
         w2 = w2 - (learnRate * a2.reshape(a2.shape[0], 1) * i2hLayer)
 
         # input to hidden Layer
-        a1 = np.sum(a2.reshape(a2.shape[0], 1) * sigmoid_dif(w2_tmp), axis=0)
+        a1 = np.sum(a2.reshape(a2.shape[0], 1) * sigmoid_dif(i2hLayerNet), axis=0)
         b1 = b1 - learnRate * a1
         w1 = w1 - (learnRate * a1.reshape(a1.shape[0], 1) * train_x[index_train])
 

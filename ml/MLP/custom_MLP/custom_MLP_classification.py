@@ -7,7 +7,7 @@ def weighted_sum(x, w, b):
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 def sigmoid_dif(x):
-    return x * (1-x)
+    return sigmoid(x) * (1-sigmoid(x))
 
 def softmax(x):
     return np.exp(x) / np.sum(np.exp(x))
@@ -54,11 +54,14 @@ for index_epoch in range(epoch):
     print(index_epoch+1, "번째 학습입니다.", index_epoch+1 , "/", epoch)
     err = []
     for index_train in range(len(train_x)):
+        # hidden to output Layer
         # FeedForword(순전파)
         # input to hidden Layer
-        i2hLayer = sigmoid(weighted_sum(train_x[index_train], w1, b1))
+        i2hLayerNet = weighted_sum(train_x[index_train], w1, b1)
+        i2hLayer = sigmoid(i2hLayerNet)
         # hidden to output Layer
-        h2oLayer = softmax(weighted_sum(i2hLayer, w2, b2))
+        h2oLayerNet = weighted_sum(i2hLayer, w2, b2)
+        h2oLayer = softmax(h2oLayerNet)
 
         # Error
         Error = np.sum(h2oLayer[train_y[index_train]])-1
@@ -76,7 +79,7 @@ for index_epoch in range(epoch):
         w2 = w2 - (learnRate * a2.reshape(a2.shape[0], 1) * i2hLayer)
 
         # input to hidden Layer
-        a1 = np.sum(a2.reshape(a2.shape[0], 1) * sigmoid_dif(i2hLayer), axis=0)
+        a1 = np.sum(a2.reshape(a2.shape[0], 1) * sigmoid_dif(i2hLayerNet), axis=0)
         b1 = b1 - learnRate * a1
         w1 = w1 - (learnRate * a1.reshape(a1.shape[0], 1) * train_x[index_train])
 
