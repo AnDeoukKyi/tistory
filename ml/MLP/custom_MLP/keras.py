@@ -1,19 +1,35 @@
-import numpy as np
 import tensorflow as tf
+from tensorflow.keras import datasets
 
+# 1. MNIST 데이터셋 임포트
+mnist = datasets.mnist
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-# input - hidden layer
-w1 = np.random.randn(6, 15)
-b1 = np.random.randn(6)
-f1 = "sgimoid"
-# hidden - output layer
-w2 = np.random.randn(3, 6)
-b2 = np.random.randn(3)
-f2 = "softmax"
+# 2. 데이터 전처리
+x_train, x_test = x_train/255.0, x_test/255.0
 
-#------------------------------------------------------------
-
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(6, input_shape=(15,), activation='sigmoid'),
-    tf.keras.layers.Dense(3, activation='softmax')
+# 3. 모델 구성
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(input_shape=(28, 28), activation=tf.nn.relu),
+    tf.keras.layers.Dense(512, activation=tf.nn.relu),
+    tf.keras.layers.Dense(10, activation=tf.nn.softmax)
 ])
+model.summary()
+
+
+# 4. 모델 컴파일
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+
+
+
+
+
+# 5. 모델 훈련
+model.fit(x_test, y_test, epochs=5)
+
+# 6. 정확도 평가
+test_loss, test_acc = model.evaluate(x_test, y_test)
+print('테스트 정확도:', test_acc)
