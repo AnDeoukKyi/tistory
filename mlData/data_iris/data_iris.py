@@ -7,7 +7,7 @@ import numpy as np
 # Sepal Width(꽃받침 너비)
 # Petal Length(꽃잎 길이)
 # Petal Width(꽃잎 너비)
-# Speicies(품종)
+# Speicies(품종)(0~3으로 카테고리화 함)
 
 # train(150건) == test(150건)
 def irisData(col=-1):
