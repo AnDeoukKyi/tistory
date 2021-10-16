@@ -25,7 +25,7 @@ import numpy as np
 
 def downloadFile(ver):
     if not os.path.isfile("mnist" + str(ver) + "_test.csv"):
-        remote_url = "https://github.com/AnDeoukKyi/tistory/raw/main/mlData/data_mnist/mnist" + str(ver) + "_csv.zip"
+        remote_url = "https://github.com/AnDeoukKyi/tistory/raw/main/mlData/data_zip/mnist" + str(ver) + "_csv.zip"
         local_file = "mnist" + str(ver) + "_csv.zip"
         data = requests.get(remote_url)
         # download
