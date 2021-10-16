@@ -1,3 +1,6 @@
+import requests
+import os
+import zipfile
 import pandas as pd
 import numpy as np
 
@@ -19,7 +22,27 @@ import numpy as np
 # 8             8           8	Bag
 # 9             9           9	Ankle boot
 
+
+def downloadFile(ver):
+    if not os.path.isfile("mnist" + str(ver) + "_test.csv"):
+        remote_url = "https://github.com/AnDeoukKyi/tistory/raw/main/mlData/data_mnist/mnist" + str(ver) + "_csv.zip"
+        local_file = "mnist" + str(ver) + "_csv.zip"
+        data = requests.get(remote_url)
+        # download
+        with open(local_file, 'wb') as file:
+            file.write(data.content)
+        # file wait
+        while not os.path.isfile(local_file):
+            pass
+        # unzip
+        zipfile.ZipFile(local_file).extractall()
+
+        # del zipfile
+        os.remove(local_file)
+
+
 def mnist1Data():
+    downloadFile(1)
     x_train = pd.read_csv("mnist1_train.csv", header=None).values
     x_train = x_train.astype(np.uint8)
     y_train = x_train[:, 0]
@@ -33,6 +56,7 @@ def mnist1Data():
 
 
 def mnist2Data():
+    downloadFile(2)
     x_train = pd.read_csv("mnist2_train.csv", header=None).values
     x_train = x_train.astype(np.uint8)
     y_train = x_train[:, 0]
